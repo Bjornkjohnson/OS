@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1841EF651A34B52E003E22DE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1841EF641A34B52E003E22DE /* main.cpp */; };
+		1841EF6F1A34B554003E22DE /* FscanDiskQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */; };
+		1841EF701A34B554003E22DE /* PCB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1841EF6D1A34B554003E22DE /* PCB.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,10 @@
 /* Begin PBXFileReference section */
 		1841EF611A34B52E003E22DE /* OSprogram3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OSprogram3; sourceTree = BUILT_PRODUCTS_DIR; };
 		1841EF641A34B52E003E22DE /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FscanDiskQueue.cpp; sourceTree = "<group>"; };
+		1841EF6C1A34B554003E22DE /* FscanDiskQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FscanDiskQueue.h; sourceTree = "<group>"; };
+		1841EF6D1A34B554003E22DE /* PCB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PCB.cpp; sourceTree = "<group>"; };
+		1841EF6E1A34B554003E22DE /* PCB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PCB.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				1841EF641A34B52E003E22DE /* main.cpp */,
+				1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */,
+				1841EF6C1A34B554003E22DE /* FscanDiskQueue.h */,
+				1841EF6D1A34B554003E22DE /* PCB.cpp */,
+				1841EF6E1A34B554003E22DE /* PCB.h */,
 			);
 			path = OSprogram3;
 			sourceTree = "<group>";
@@ -118,6 +128,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1841EF701A34B554003E22DE /* PCB.cpp in Sources */,
+				1841EF6F1A34B554003E22DE /* FscanDiskQueue.cpp in Sources */,
 				1841EF651A34B52E003E22DE /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
