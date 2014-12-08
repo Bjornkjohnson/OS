@@ -64,10 +64,10 @@
 			isa = PBXGroup;
 			children = (
 				1841EF641A34B52E003E22DE /* main.cpp */,
-				1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */,
 				1841EF6C1A34B554003E22DE /* FscanDiskQueue.h */,
-				1841EF6D1A34B554003E22DE /* PCB.cpp */,
+				1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */,
 				1841EF6E1A34B554003E22DE /* PCB.h */,
+				1841EF6D1A34B554003E22DE /* PCB.cpp */,
 			);
 			path = OSprogram3;
 			sourceTree = "<group>";
@@ -244,6 +244,7 @@
 				1841EF6A1A34B52E003E22DE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

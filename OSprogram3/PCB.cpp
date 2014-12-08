@@ -39,12 +39,19 @@ void PCB::setReadWrite(char readWrite){
 void PCB::setFileLength(int fileLength){
     this->fileLength = fileLength;
 }
+void PCB::setProcessSize(int processSize){
+    this->processSize = processSize;
+}
 void PCB::printPCB(){
     cout << PID << endl;
 }
 
 int PCB::getPID(){
     return this->PID;
+}
+
+int PCB::getProcessSize(){
+    return this->processSize;
 }
 
 ostream& operator<<(ostream& out, const PCB& dt){

@@ -11,7 +11,10 @@
 #include "PCB.h"
 #include <string>
 #include "FscanDiskQueue.h"
+#include <algorithm>
 using namespace std;
+
+bool sortHelp (PCB i,PCB j) { return (i.getProcessSize()<j.getProcessSize()); }
 
 void printWelcome(){
     cout << "Welcome SIMPLE OS" << endl;
@@ -129,6 +132,13 @@ int readTimeSlice(PCB & current, int maxSlice){
 
 }
 
+void updateMem(int & usedMem, int &totalMemSize, int & freeMem, deque<PCB> & readyQueue){
+    usedMem = usedMem - readyQueue.front().getProcessSize();
+    freeMem = totalMemSize - usedMem;
+    cout << "Free Memory: " << freeMem << endl;
+    cout << "Used Memory: " << usedMem << endl;
+
+}
 
 int main(int argc, const char * argv[]) {
     int printerNum;
@@ -143,6 +153,8 @@ int main(int argc, const char * argv[]) {
     int totalMemSize;
     int maxProcessSize;
     int pageSize;
+    int freeMem = 0;
+    int usedMem = 0;
     string userInput;
     vector<int> cylinderNum;
     vector<deque<PCB> > printers;
@@ -152,6 +164,7 @@ int main(int argc, const char * argv[]) {
     FscanDiskQueue diskQueue;
     deque<PCB> cdrwQueue;
     deque<PCB> readyQueue;
+    deque<PCB> jobPool;
     
     
     printWelcome();
@@ -335,10 +348,51 @@ int main(int argc, const char * argv[]) {
                 
                 //ADD PROCESSES*****************************************
                 if (userInput == "A") {
-                    PCB newProcess(systemPID);
-                    readyQueue.push_back(newProcess);
-                    systemPID++;
-                    cout << "Process added to ready queue" << endl << endl;
+                    
+                    int processSize;
+                    cout << "What is the size of the Process: ";
+                    cin >> processSize;
+                    cout << endl;
+                    while(!cin || processSize < 1 )
+                    {
+                        cout << "Invalid Input!" << endl;
+                        cout << "Max Process Size is " << maxProcessSize << endl;
+                        cout << "What is the size of the Process: " << endl;
+                        cin.clear();
+                        cin.ignore(100,'\n');
+                        cin >> processSize;
+                        cout << endl;
+                    }
+                    if (processSize > maxProcessSize ) {
+                        cout << "Process is too large and has been rejected." << endl << endl;
+                    }
+                    else{
+                        cout << " The Process Size is " << processSize << endl;
+                        cout << endl;
+                        PCB newProcess(systemPID);
+                        newProcess.setProcessSize(processSize);
+                        if ((usedMem + processSize) < totalMemSize) {
+                            readyQueue.push_back(newProcess);
+                            cout << "Process added to ready queue" << endl << endl;
+                            usedMem += processSize;
+                            freeMem = totalMemSize - usedMem;
+                            cout << "Free Memory: " << freeMem << endl;
+                            cout << "Used Memory: " << usedMem << endl << endl;
+                            
+                        }
+                        else{
+                            jobPool.push_back(newProcess);
+                            sort(jobPool.begin(), jobPool.end(), sortHelp);
+                            cout << "Process added to Job Pool" << endl << endl;
+                            cout << "Free Memory: " << freeMem << endl;
+                            cout << "Used Memory: " << usedMem << endl << endl;
+                        }
+                        
+                        
+                        systemPID++;
+                        
+                    }
+                    
                 }
                 
                 //SNAPSHOTS*****************************************
@@ -448,9 +502,37 @@ int main(int argc, const char * argv[]) {
                         
                         terminatedProcessCount++;
                         terminatedProcessTotalTime += readyQueue.front().getTotalProcessTime();
+                        
+                        usedMem = usedMem - readyQueue.front().getProcessSize();
+                        freeMem = totalMemSize - usedMem;
+                        cout << "Free Memory: " << freeMem << endl;
+                        cout << "Used Memory: " << usedMem << endl;
+                        
                         readyQueue.pop_front();
                         cout  << endl;
                         totalAveTerminatedCpuTime = (float)terminatedProcessTotalTime/terminatedProcessCount;
+                        
+                        int i = 0;
+                        while (!jobPool.empty() && jobPool.front().getProcessSize() < freeMem ) {
+                            while (jobPool.back().getProcessSize() > freeMem && i < jobPool.size()) {
+                                jobPool.push_front(jobPool.back());
+                                jobPool.pop_back();
+                            }
+                            if (jobPool.back().getProcessSize() < freeMem) {
+                                readyQueue.push_back(jobPool.back());
+                                jobPool.pop_back();
+                                cout << "Process " << readyQueue.back().getPID() << " added to Ready Queue" << endl;
+                                usedMem = usedMem + readyQueue.back().getProcessSize();
+                                freeMem = totalMemSize - usedMem;
+                                cout << "Free Memory: " << freeMem << endl;
+                                cout << "Used Memory: " << usedMem << endl;
+                                i = 0;
+                            }
+                            sort(jobPool.begin(), jobPool.end(), sortHelp);
+                        }
+                        
+                        
+                        
                         
                     }
                 }

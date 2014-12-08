@@ -26,6 +26,7 @@ private:
     int cpuCount;
     int cylinderNum;
     float aveBurstTime;
+    int processSize;
     
 public:
     PCB(int);
@@ -34,8 +35,10 @@ public:
     void setMemStart(int);
     void setReadWrite(char);
     void setFileLength(int);
+    void setProcessSize(int);
     void printPCB();
     int getPID();
+    int getProcessSize();
     friend ostream& operator<<(ostream& out, const PCB& dt);
     void fillPCB(char, bool, int);
     void updateProcessTime(int);
@@ -44,6 +47,7 @@ public:
     int getCpuCount();
     float getAveBurstTime();
     friend bool operator<(const PCB&, const PCB &);
+    
     friend bool operator==(const PCB&, const PCB &);
     
 
