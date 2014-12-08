@@ -159,6 +159,57 @@ int main(int argc, const char * argv[]) {
     cout << "*************SYS GEN***************" << endl;
     
     //SYS GEN*****************************************
+    //************TotalMemSize****************
+    cout << "What is the total Memory Size: ";
+    cin >> totalMemSize;
+    cout << endl;
+    while(!cin || totalMemSize < 1)
+    {
+        cout << "Invalid Input!" << endl;
+        cout << "What is the total Memory Size: ";
+        cin.clear();
+        cin.ignore(100,'\n');
+        cin >> timeSlice;
+        cout << endl;
+    }
+    cout << " The Total Memory Size is " << totalMemSize << endl;
+    cout << endl;
+
+    //************MaxProcessSize****************
+    cout << "What is the Max Process Size: ";
+    cin >> maxProcessSize;
+    cout << endl;
+    while(!cin || maxProcessSize < 1 || maxProcessSize > totalMemSize)
+    {
+        cout << "Invalid Input!" << endl;
+        cout << "Max Process size must be less than Total Memory Size." << endl;
+        cout << "What is the Max Process Size: ";
+        cin.clear();
+        cin.ignore(100,'\n');
+        cin >> maxProcessSize;
+        cout << endl;
+    }
+    cout << " The Max Process Size is " << maxProcessSize << endl;
+    cout << endl;
+
+    //************PageSize****************
+    cout << "What is the Page Size: ";
+    cin >> pageSize;
+    cout << endl;
+    while(!cin || pageSize < 1 || totalMemSize % pageSize != 0
+                || ((pageSize == 0) && (pageSize & (pageSize - 1))) )
+    {
+        cout << "Invalid Input!" << endl;
+        cout << "Total Memory Size must be evenly divisible by Page Size." << endl;
+        cout << "What is the Page Size: ";
+        cin.clear();
+        cin.ignore(100,'\n');
+        cin >> pageSize;
+        cout << endl;
+    }
+    cout << " The Page Size is " << pageSize << endl;
+    cout << endl;
+    //cout << "Total Memory size must be deivisible by" << endl;
     //************Timeslice****************
     cout << "How long is a time slice (in milliseconds): ";
     cin >> timeSlice;
