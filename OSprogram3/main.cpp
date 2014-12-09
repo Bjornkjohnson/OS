@@ -53,34 +53,35 @@ void printListHeader(float totAVetermCpuTime, int freeMem, int usedMem){
     
     cout << "Free Memory: " << freeMem << "    Used Memory: " << usedMem << endl;
     cout << "Average Total CPU Time of Terminated Process: " << totAVetermCpuTime << endl;
-    cout <<" -----------------------------------------------------------------------------------------"<<endl;
-
+    cout <<" ---------------------------------------------------------------------------------------------"<<endl;
     
     cout << left << "| " <<  setw(5) << "PID"
     << left << "| " <<  setw(9) << "Filename"
     << left << "| " <<  setw(8) << "Mem"
+    << left << "| " <<  setw(9) << "Physical"
     << left << "| " <<  setw(5) << "R/W"
     << left << "| " <<  setw(8) << "File"
     << left << "| " <<  setw(6) << "Cyl #"
     << left << "| " <<  setw(6) << "CPU"
     << left << "| " <<  setw(10) << "Ave Burst"
-    << left << "| " <<  setw(14) << "Page Table"
+    << left << "| " <<  setw(8) << "Page"
     << left << "| "
     << endl;
     
     cout << left << "| " <<  setw(5) << ""
     << left << "| " <<  setw(9) << ""
     << left << "| " <<  setw(8) << "Start"
+    << left << "| " <<  setw(9) << "Address"
     << left << "| " <<  setw(5) << ""
     << left << "| " <<  setw(8) << "Length"
     << left << "| " <<  setw(6) << ""
     << left << "| " <<  setw(6) << "Time"
     << left << "| " <<  setw(10) << "Time"
-    << left << "| " <<  setw(14) << ""
+    << left << "| " <<  setw(8) << "Table"
     << left << "| "
     << endl;
     
-    cout <<" -----------------------------------------------------------------------------------------"<<endl;
+    cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
 
     
@@ -137,13 +138,13 @@ int readTimeSlice(PCB & current, int maxSlice){
 
 }
 
-void updateMem(int & usedMem, int &totalMemSize, int & freeMem, deque<PCB> & readyQueue){
-    usedMem = usedMem - readyQueue.front().getProcessSize();
-    freeMem = totalMemSize - usedMem;
-    cout << "Free Memory: " << freeMem << endl;
-    cout << "Used Memory: " << usedMem << endl;
-
-}
+//void updateMem(int & usedMem, int &totalMemSize, int & freeMem, deque<PCB> & readyQueue){
+//    usedMem = usedMem - readyQueue.front().getProcessSize();
+//    freeMem = totalMemSize - usedMem;
+//    cout << "Free Memory: " << freeMem << endl;
+//    cout << "Used Memory: " << usedMem << endl;
+//
+//}
 
 int main(int argc, const char * argv[]) {
     int printerNum;
@@ -155,11 +156,11 @@ int main(int argc, const char * argv[]) {
     float totalAveTerminatedCpuTime = 0;
     //int cylinderNum;
     int systemPID = 0;
-    int totalMemSize;
-    int processSize;
-    int roundedProcessSize;
+    int totalMemSize = 0;
+    int processSize = 0;
+    int roundedProcessSize = 0;
     int maxProcessSize;
-    int pageSize;
+    int pageSize = 0;
     int freeMem = 0;
     int usedMem = 0;
     bool active = false;
@@ -467,6 +468,7 @@ int main(int argc, const char * argv[]) {
                             cout << left << "| " <<  setw(5) << readyQueue[i].getPID()
                             << left << "| " <<  setw(9) << "N/A"
                             << left << "| " <<  setw(8) << "N/A"
+                            << left << "| " <<  setw(9) << "N/A"
                             << left << "| " <<  setw(5)  << "N/A"
                             << left << "| " <<  setw(8) << "N/A"
                             << left << "| " <<  setw(6)  << "N/A"
@@ -478,7 +480,7 @@ int main(int argc, const char * argv[]) {
 
                             //cout << readyQueue[i].getPID() << endl;
                         }
-                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+                        cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
                         cout  << endl;
                     }
@@ -496,7 +498,7 @@ int main(int argc, const char * argv[]) {
                                 cout << printers[i][j];
                             }
                         }
-                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+                        cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
                         cout  << endl;
                     }
@@ -512,7 +514,7 @@ int main(int argc, const char * argv[]) {
                             //<<"--------------------------------------------------------------------" << endl;
                             disks[i].printDiskQueue();
                         }
-                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+                        cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
                         cout  << endl;
                     }
@@ -529,7 +531,7 @@ int main(int argc, const char * argv[]) {
                                 cout << cdrws[i][j];
                             }
                         }
-                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+                        cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
                         cout  << endl;
                     }
@@ -639,7 +641,7 @@ int main(int argc, const char * argv[]) {
                     userInput.erase(0,1);
                     if (checkValidNum(userInput, printerNum)) {
                         if (!readyQueue.empty()) {
-                            readyQueue.front().fillPCB('p', false, 0);
+                            readyQueue.front().fillPCB('p', false, 0,pageSize);
                             printers[stoi(userInput)].push_back(readyQueue.front());
                             readyQueue.pop_front();
                             readTimeSlice(printers[stoi(userInput)].back(), timeSlice);
@@ -663,7 +665,7 @@ int main(int argc, const char * argv[]) {
                     userInput.erase(0,1);
                     if (checkValidNum(userInput,diskNum)) {
                         if (!readyQueue.empty()) {
-                            readyQueue.front().fillPCB('d', true, cylinderNum[stoi(userInput)-1]);
+                            readyQueue.front().fillPCB('d', true, cylinderNum[stoi(userInput)-1], pageSize);
                             readTimeSlice(readyQueue.front(), timeSlice);
                             readyQueue.front().increaseCpuCount();
                             disks[stoi(userInput)].push_back(readyQueue.front());
@@ -685,7 +687,7 @@ int main(int argc, const char * argv[]) {
                     userInput.erase(0,1);
                     if (checkValidNum(userInput,cdrwNum)) {
                         if (!readyQueue.empty()) {
-                            readyQueue.front().fillPCB('c', false, 0);
+                            readyQueue.front().fillPCB('c', false, 0, pageSize);
                             cdrws[stoi(userInput)].push_back(readyQueue.front());
                             readyQueue.pop_front();
                             readTimeSlice(cdrws[stoi(userInput)].back(), timeSlice);

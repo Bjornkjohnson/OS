@@ -21,6 +21,7 @@ PCB::PCB(int PID){
     cpuCount = 0;
     cylinderNum = 0;
     aveBurstTime = 0;
+    physicalAddress = 0;
     
     
 }
@@ -76,12 +77,13 @@ ostream& operator<<(ostream& out, const PCB& dt){
         out << left << "| " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
         << left << "| " <<  setw(8) <<dt.memStart
+        << left << "| " <<  setw(9) <<dt.physicalAddress
         << left << "| " <<  setw(5)  <<dt.readWrite
         << left << "| " <<  setw(8) << "N/A"
         << left << "| " <<  setw(6)  << "N/A"
         << left << "| " <<  setw(6) << dt.totalProcessTime
         << left << "| " <<  setw(10) << ((float)dt.totalProcessTime)/dt.cpuCount
-        << left << "| " <<  setw(8);
+        << left << "| ";
         dt.printFrames();
         
     }
@@ -89,38 +91,41 @@ ostream& operator<<(ostream& out, const PCB& dt){
         out << left << "| " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
         << left << "| " <<  setw(8) << dt.memStart
+        << left << "| " <<  setw(9) <<dt.physicalAddress
         << left << "| " <<  setw(5)  << dt.readWrite
         << left << "| " <<  setw(8) << dt.fileLength
         << left << "| " <<  setw(6)  << "N/A"
         << left << "| " <<  setw(6) << dt.totalProcessTime
         << left << "| " <<  setw(10) << ((float)dt.totalProcessTime)/dt.cpuCount
-        << left << "| "
-        << endl;
+        << left << "| ";
+        dt.printFrames();
     }
     else if (dt.readWrite == "w" && dt.cylinderNum != 0){
         out << left << "| " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) <<  dt.fileName        //file
         << left << "| " <<  setw(8) << dt.memStart        //mem
+        << left << "| " <<  setw(9) <<dt.physicalAddress
         << left << "| " <<  setw(5)  <<  dt.readWrite       //read
         << left << "| " <<  setw(8) <<  dt.fileLength      //length
         << left << "| " <<  setw(6)  <<  dt.cylinderNum      //cyl#
         << left << "| " <<  setw(6) << dt.totalProcessTime              //CPUtime
         << left << "| " <<  setw(10) << ((float)dt.totalProcessTime)/dt.cpuCount               //AveBur
-        << left << "| "
-        << endl;
+        << left << "| ";
+        dt.printFrames();
 
     }
     else {
         out << left << "| " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
         << left << "| " <<  setw(8) << dt.memStart
+        << left << "| " <<  setw(9) <<dt.physicalAddress
         << left << "| " <<  setw(5)  << dt.readWrite
         << left << "| " <<  setw(8) << "N/A"
         << left << "| " <<  setw(6)  << dt.cylinderNum
         << left << "| " <<  setw(6) << dt.totalProcessTime
         << left << "| " <<  setw(10) << ((float)dt.totalProcessTime)/dt.cpuCount
-        << left << "| "
-        << endl;
+        << left << "| ";
+        dt.printFrames();
         
     }
 
@@ -128,14 +133,14 @@ ostream& operator<<(ostream& out, const PCB& dt){
     return out;
 }
 
-void PCB::fillPCB(char procType, bool isDisk, int cylinderMax){
+void PCB::fillPCB(char procType, bool isDisk, int cylinderMax, int pageSize){
     cout << "Please enter filename: ";
     cin >> this->fileName;
     cout << endl;
     
     //**********************************
-    cout << "Please enter mem start: ";
-    cin >> this->memStart;
+    cout << "Please enter mem start in hex: ";
+    cin >> hex >> this->memStart;
     while(!cin)
     {
         cout << "That was not a number!" << endl;
@@ -146,6 +151,9 @@ void PCB::fillPCB(char procType, bool isDisk, int cylinderMax){
         cout << endl;
     }
     cout << endl;
+    setPhysicalAddress(memStart, pageSize);
+    
+    cout << "The Physical Address is: " << hex << physicalAddress << dec << endl << endl;
     
     //*************************************
     if (procType == 'c' || procType == 'd') {
@@ -237,6 +245,12 @@ float PCB::getAveBurstTime(){
 
 void PCB::updateFrames(int frameNum){
     frames.push_back(frameNum);
+}
+
+void PCB::setPhysicalAddress(int logicalAddress, int pageSize){
+    int pageNum = logicalAddress / pageSize;
+    int frameNum = frames[pageNum];
+    physicalAddress = frameNum * pageSize + logicalAddress % pageSize;
 }
 
 bool operator<(const PCB &lhs, const PCB &rhs){

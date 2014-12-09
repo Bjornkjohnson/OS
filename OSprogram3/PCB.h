@@ -29,6 +29,7 @@ private:
     float aveBurstTime;
     int processSize;
     vector<int> frames;
+    int physicalAddress;
     
 public:
     PCB(int);
@@ -45,13 +46,15 @@ public:
     vector<int> getFrames();
     void printFrames() const;
     friend ostream& operator<<(ostream& out, const PCB& dt);
-    void fillPCB(char, bool, int);
+    void fillPCB(char, bool, int, int);
     void updateProcessTime(int);
     int getTotalProcessTime();
     void increaseCpuCount();
     int getCpuCount();
     float getAveBurstTime();
     void updateFrames(int);
+    void setPhysicalAddress(int, int);
+    int getPhysicalAddress();
     friend bool operator<(const PCB&, const PCB &);
     
     friend bool operator==(const PCB&, const PCB &);
