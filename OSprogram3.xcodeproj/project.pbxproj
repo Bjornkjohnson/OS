@@ -10,6 +10,7 @@
 		1841EF651A34B52E003E22DE /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1841EF641A34B52E003E22DE /* main.cpp */; };
 		1841EF6F1A34B554003E22DE /* FscanDiskQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */; };
 		1841EF701A34B554003E22DE /* PCB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1841EF6D1A34B554003E22DE /* PCB.cpp */; };
+		40BC5C931A36563300EA41BD /* FrameList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40BC5C911A36563300EA41BD /* FrameList.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,8 @@
 		1841EF6C1A34B554003E22DE /* FscanDiskQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FscanDiskQueue.h; sourceTree = "<group>"; };
 		1841EF6D1A34B554003E22DE /* PCB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PCB.cpp; sourceTree = "<group>"; };
 		1841EF6E1A34B554003E22DE /* PCB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PCB.h; sourceTree = "<group>"; };
+		40BC5C911A36563300EA41BD /* FrameList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FrameList.cpp; sourceTree = "<group>"; };
+		40BC5C921A36563300EA41BD /* FrameList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FrameList.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +71,8 @@
 				1841EF6B1A34B554003E22DE /* FscanDiskQueue.cpp */,
 				1841EF6E1A34B554003E22DE /* PCB.h */,
 				1841EF6D1A34B554003E22DE /* PCB.cpp */,
+				40BC5C921A36563300EA41BD /* FrameList.h */,
+				40BC5C911A36563300EA41BD /* FrameList.cpp */,
 			);
 			path = OSprogram3;
 			sourceTree = "<group>";
@@ -131,6 +136,7 @@
 				1841EF701A34B554003E22DE /* PCB.cpp in Sources */,
 				1841EF6F1A34B554003E22DE /* FscanDiskQueue.cpp in Sources */,
 				1841EF651A34B52E003E22DE /* main.cpp in Sources */,
+				40BC5C931A36563300EA41BD /* FrameList.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

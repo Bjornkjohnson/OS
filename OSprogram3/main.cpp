@@ -49,10 +49,12 @@ void printWelcome(){
     
 }
 
-void printListHeader(float totAVetermCpuTime){
+void printListHeader(float totAVetermCpuTime, int freeMem, int usedMem){
     
+    cout << "Free Memory: " << freeMem << "    Used Memory: " << usedMem << endl;
     cout << "Average Total CPU Time of Terminated Process: " << totAVetermCpuTime << endl;
-    cout <<" ------------------------------------------------------------------------"<<endl;
+    cout <<" -----------------------------------------------------------------------------------------"<<endl;
+
     
     cout << left << "| " <<  setw(5) << "PID"
     << left << "| " <<  setw(9) << "Filename"
@@ -62,6 +64,7 @@ void printListHeader(float totAVetermCpuTime){
     << left << "| " <<  setw(6) << "Cyl #"
     << left << "| " <<  setw(6) << "CPU"
     << left << "| " <<  setw(10) << "Ave Burst"
+    << left << "| " <<  setw(14) << "Page Table"
     << left << "| "
     << endl;
     
@@ -73,10 +76,12 @@ void printListHeader(float totAVetermCpuTime){
     << left << "| " <<  setw(6) << ""
     << left << "| " <<  setw(6) << "Time"
     << left << "| " <<  setw(10) << "Time"
+    << left << "| " <<  setw(14) << ""
     << left << "| "
     << endl;
     
-    cout <<" ------------------------------------------------------------------------"<<endl;
+    cout <<" -----------------------------------------------------------------------------------------"<<endl;
+
 
     
     
@@ -151,15 +156,19 @@ int main(int argc, const char * argv[]) {
     //int cylinderNum;
     int systemPID = 0;
     int totalMemSize;
+    int processSize;
+    int roundedProcessSize;
     int maxProcessSize;
     int pageSize;
     int freeMem = 0;
     int usedMem = 0;
+    bool active = false;
     string userInput;
     vector<int> cylinderNum;
     vector<deque<PCB> > printers;
     vector<FscanDiskQueue> disks;
     vector<deque<PCB> > cdrws;
+    vector<bool> frameList;
     deque<PCB> printerQueue;
     FscanDiskQueue diskQueue;
     deque<PCB> cdrwQueue;
@@ -311,7 +320,7 @@ int main(int argc, const char * argv[]) {
     cout << cdrwNum << " CD/RWs added" << endl;
     cout << endl;
     
-    //*************MakeQueues***************
+    //*************MakeQueuesAndFrameList***************
     for (int i = 0; i < printerNum+1; i++) {
         printers.push_back(printerQueue);
     }
@@ -322,6 +331,12 @@ int main(int argc, const char * argv[]) {
     
     for (int i = 0; i < cdrwNum+1; i++) {
         cdrws.push_back(cdrwQueue);
+    }
+    
+    int totalFrames = totalMemSize / pageSize;
+    
+    for (int i = 0; i< totalFrames; i++) {
+        frameList.push_back(active);
     }
     
     
@@ -349,7 +364,7 @@ int main(int argc, const char * argv[]) {
                 //ADD PROCESSES*****************************************
                 if (userInput == "A") {
                     
-                    int processSize;
+                    
                     cout << "What is the size of the Process: ";
                     cin >> processSize;
                     cout << endl;
@@ -374,10 +389,41 @@ int main(int argc, const char * argv[]) {
                         if ((usedMem + processSize) < totalMemSize) {
                             readyQueue.push_back(newProcess);
                             cout << "Process added to ready queue" << endl << endl;
-                            usedMem += processSize;
-                            freeMem = totalMemSize - usedMem;
+                            if (processSize % pageSize == 0) {
+                                usedMem += processSize;
+                                freeMem = totalMemSize - usedMem;
+                            }
+                            else{
+                                roundedProcessSize = ((processSize / pageSize) + 1) * pageSize;
+                                usedMem += roundedProcessSize;
+                                freeMem = totalMemSize - usedMem;
+                            }
+                            
+                            //usedMem += processSize;
+                            //freeMem = totalMemSize - usedMem;
                             cout << "Free Memory: " << freeMem << endl;
                             cout << "Used Memory: " << usedMem << endl << endl;
+                            
+                            int framesNeeded;
+                            
+                            if (processSize % pageSize == 0) {
+                                framesNeeded = processSize/pageSize;
+                            }
+                            else{
+                                framesNeeded = (processSize/pageSize) + 1;
+                            }
+                            
+                            int i = 0;
+                            int j = 0;
+                            while (j < framesNeeded) {
+                                
+                                if (frameList[i] == false) {
+                                    frameList[i] = true;
+                                    readyQueue.back().updateFrames(i);
+                                    j++;
+                                }
+                                i++;
+                            }
                             
                         }
                         else{
@@ -411,7 +457,7 @@ int main(int argc, const char * argv[]) {
                     //READY QUEUE PRINT*****************************************
                     if (userInput == "r") {
                         cout << endl << "READY QUEUE" << endl;
-                        printListHeader(totalAveTerminatedCpuTime);
+                        printListHeader(totalAveTerminatedCpuTime, freeMem, usedMem);
                         for (int i = 0; i < readyQueue.size(); i++) {
                             float aveBurst = 0;
                             if (readyQueue[i].getCpuCount() > 0) {
@@ -426,19 +472,21 @@ int main(int argc, const char * argv[]) {
                             << left << "| " <<  setw(6)  << "N/A"
                             << left << "| " <<  setw(6) << readyQueue[i].getTotalProcessTime()
                             << left << "| " <<  setw(10) << readyQueue[i].getAveBurstTime()
-                            << left << "| "
-                            << endl;
+                            << left << "| ";
+                            readyQueue[i].printFrames();
+                            
 
                             //cout << readyQueue[i].getPID() << endl;
                         }
-                        cout <<" ------------------------------------------------------------------------"<<endl;
+                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+
                         cout  << endl;
                     }
                     
                     //PRINTER QUEUE PRINT*****************************************
                     else if (userInput == "p") {
                         cout << endl << "PRINTER QUEUE" << endl;
-                        printListHeader(totalAveTerminatedCpuTime);
+                        printListHeader(totalAveTerminatedCpuTime, freeMem, usedMem);
                         
                         for (int i = 1; i < printers.size(); i++) {
                             cout << " --"<< "p" << i << endl;
@@ -448,7 +496,8 @@ int main(int argc, const char * argv[]) {
                                 cout << printers[i][j];
                             }
                         }
-                        cout <<" ------------------------------------------------------------------------"<<endl;
+                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+
                         cout  << endl;
                     }
                     
@@ -456,21 +505,22 @@ int main(int argc, const char * argv[]) {
                     //DISK QUEUE PRINT*****************************************
                     else if (userInput == "d") {
                         cout << endl << "DISK QUEUE" << endl;
-                        printListHeader(totalAveTerminatedCpuTime);
+                        printListHeader(totalAveTerminatedCpuTime, freeMem, usedMem);
                         
                         for (int i = 1; i < disks.size(); i++) {
                             cout << " --"<< "d" << i << endl;
                             //<<"--------------------------------------------------------------------" << endl;
                             disks[i].printDiskQueue();
                         }
-                        cout <<" ------------------------------------------------------------------------"<<endl;
+                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+
                         cout  << endl;
                     }
                     
                     //CDRW QUEUE PRINT*****************************************
                     else if (userInput == "c") {
                         cout << endl << "CDRW QUEUE" << endl;
-                        printListHeader(totalAveTerminatedCpuTime);
+                        printListHeader(totalAveTerminatedCpuTime, freeMem, usedMem);
                         
                         for (int i = 1; i < cdrws.size(); i++) {
                             cout << " --"<< "c" << i << endl;
@@ -479,7 +529,8 @@ int main(int argc, const char * argv[]) {
                                 cout << cdrws[i][j];
                             }
                         }
-                        cout <<" ------------------------------------------------------------------------"<<endl;
+                        cout <<" -----------------------------------------------------------------------------------------"<<endl;
+
                         cout  << endl;
                     }
                     
@@ -503,14 +554,30 @@ int main(int argc, const char * argv[]) {
                         terminatedProcessCount++;
                         terminatedProcessTotalTime += readyQueue.front().getTotalProcessTime();
                         
-                        usedMem = usedMem - readyQueue.front().getProcessSize();
-                        freeMem = totalMemSize - usedMem;
+                        if (readyQueue.front().getProcessSize() % pageSize == 0) {
+                            usedMem = usedMem - readyQueue.front().getProcessSize();
+                            freeMem = totalMemSize - usedMem;
+                        }
+                        else{
+                            roundedProcessSize = ((readyQueue.front().getProcessSize() / pageSize) + 1) * pageSize;
+                            usedMem = usedMem - roundedProcessSize;
+                            freeMem = totalMemSize - usedMem;
+                        }
+                        
                         cout << "Free Memory: " << freeMem << endl;
                         cout << "Used Memory: " << usedMem << endl;
+                        
+                        vector<int> frames = readyQueue.front().getFrames();
+                        
+                        for (int i = 0 ; i < frames.size() ; i++) {
+                            frameList[frames[i]] = false;
+                        }
                         
                         readyQueue.pop_front();
                         cout  << endl;
                         totalAveTerminatedCpuTime = (float)terminatedProcessTotalTime/terminatedProcessCount;
+                        
+                        
                         
                         int i = 0;
                         while (!jobPool.empty() && jobPool.front().getProcessSize() < freeMem ) {
@@ -522,8 +589,16 @@ int main(int argc, const char * argv[]) {
                                 readyQueue.push_back(jobPool.back());
                                 jobPool.pop_back();
                                 cout << "Process " << readyQueue.back().getPID() << " added to Ready Queue" << endl;
-                                usedMem = usedMem + readyQueue.back().getProcessSize();
-                                freeMem = totalMemSize - usedMem;
+                                if (readyQueue.back().getProcessSize() % pageSize == 0) {
+                                    usedMem = usedMem + readyQueue.back().getProcessSize();
+                                    freeMem = totalMemSize - usedMem;
+                                }
+                                else{
+                                    roundedProcessSize = ((readyQueue.back().getProcessSize() / pageSize) + 1) * pageSize;
+                                    usedMem += roundedProcessSize;
+                                    freeMem = totalMemSize - usedMem;
+                                }
+                                
                                 cout << "Free Memory: " << freeMem << endl;
                                 cout << "Used Memory: " << usedMem << endl;
                                 i = 0;

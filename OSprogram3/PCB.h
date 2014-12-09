@@ -13,6 +13,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <vector>
 using namespace std;
 
 class PCB{
@@ -27,6 +28,7 @@ private:
     int cylinderNum;
     float aveBurstTime;
     int processSize;
+    vector<int> frames;
     
 public:
     PCB(int);
@@ -39,6 +41,9 @@ public:
     void printPCB();
     int getPID();
     int getProcessSize();
+    int getFramesSize();
+    vector<int> getFrames();
+    void printFrames() const;
     friend ostream& operator<<(ostream& out, const PCB& dt);
     void fillPCB(char, bool, int);
     void updateProcessTime(int);
@@ -46,6 +51,7 @@ public:
     void increaseCpuCount();
     int getCpuCount();
     float getAveBurstTime();
+    void updateFrames(int);
     friend bool operator<(const PCB&, const PCB &);
     
     friend bool operator==(const PCB&, const PCB &);

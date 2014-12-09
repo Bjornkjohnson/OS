@@ -54,6 +54,22 @@ int PCB::getProcessSize(){
     return this->processSize;
 }
 
+int PCB::getFramesSize(){
+    return frames.size();
+}
+
+vector<int> PCB::getFrames(){
+    return frames;
+}
+
+void PCB::printFrames() const{
+    for (int i = 0; i < frames.size() - 1; i++) {
+        cout << frames[i] << ",";
+    }
+    cout << setw(8) << frames[frames.size() - 1]  << left << "| "
+    << endl;;
+}
+
 ostream& operator<<(ostream& out, const PCB& dt){
     
     if (dt.readWrite == "r" && dt.cylinderNum == 0) {
@@ -65,8 +81,9 @@ ostream& operator<<(ostream& out, const PCB& dt){
         << left << "| " <<  setw(6)  << "N/A"
         << left << "| " <<  setw(6) << dt.totalProcessTime
         << left << "| " <<  setw(10) << ((float)dt.totalProcessTime)/dt.cpuCount
-        << left << "| "
-        << endl;
+        << left << "| " <<  setw(8);
+        dt.printFrames();
+        
     }
     else if(dt.readWrite == "w" && dt.cylinderNum == 0){
         out << left << "| " <<  setw(5) << dt.PID
@@ -216,6 +233,10 @@ int PCB::getCpuCount(){
 
 float PCB::getAveBurstTime(){
     return aveBurstTime;
+}
+
+void PCB::updateFrames(int frameNum){
+    frames.push_back(frameNum);
 }
 
 bool operator<(const PCB &lhs, const PCB &rhs){
