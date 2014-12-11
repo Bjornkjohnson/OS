@@ -140,7 +140,7 @@ void PCB::fillPCB(char procType, bool isDisk, int cylinderMax, int pageSize){
     
     //**********************************
     cout << "Please enter mem start in hex: ";
-    cin >> hex >> this->memStart;
+    cin >> hex >> this->memStart  >> dec;
     while(!cin)
     {
         cout << "That was not a number!" << endl;

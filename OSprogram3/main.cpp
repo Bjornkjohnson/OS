@@ -12,6 +12,7 @@
 #include <string>
 #include "FscanDiskQueue.h"
 #include <algorithm>
+#include <math.h>
 using namespace std;
 
 bool sortHelp (PCB i,PCB j) { return (i.getProcessSize()<j.getProcessSize()); }
@@ -145,6 +146,17 @@ int readTimeSlice(PCB & current, int maxSlice){
 //    cout << "Used Memory: " << usedMem << endl;
 //
 //}
+bool memContraintCheck(int size){
+    int exp = 1;
+    for (double j = 1; exp < size; j++) {
+        exp =(pow(2, j));
+        if (size % exp == 0) {
+            return true;
+        }
+    }
+    
+    return false;
+}
 
 int main(int argc, const char * argv[]) {
     int printerNum;
@@ -163,13 +175,13 @@ int main(int argc, const char * argv[]) {
     int pageSize = 0;
     int freeMem = 0;
     int usedMem = 0;
-    bool active = false;
+    pair<bool, int> activeRecord;
     string userInput;
     vector<int> cylinderNum;
     vector<deque<PCB> > printers;
     vector<FscanDiskQueue> disks;
     vector<deque<PCB> > cdrws;
-    vector<bool> frameList;
+    vector<pair<bool, int>> frameList;
     deque<PCB> printerQueue;
     FscanDiskQueue diskQueue;
     deque<PCB> cdrwQueue;
@@ -186,13 +198,14 @@ int main(int argc, const char * argv[]) {
     cout << "What is the total Memory Size: ";
     cin >> totalMemSize;
     cout << endl;
-    while(!cin || totalMemSize < 1)
+    while((!cin || totalMemSize < 1|| (totalMemSize == 0)) || !memContraintCheck(totalMemSize) )
     {
         cout << "Invalid Input!" << endl;
+        cout << "Total Memory Size should be divisible by a power of 2" << endl << endl;
         cout << "What is the total Memory Size: ";
         cin.clear();
         cin.ignore(100,'\n');
-        cin >> timeSlice;
+        cin >> totalMemSize;
         cout << endl;
     }
     cout << " The Total Memory Size is " << totalMemSize << endl;
@@ -216,14 +229,14 @@ int main(int argc, const char * argv[]) {
     cout << endl;
 
     //************PageSize****************
-    cout << "What is the Page Size: ";
+    cout << "What is the Page Size(Powers of 2 only): ";
     cin >> pageSize;
     cout << endl;
     while(!cin || pageSize < 1 || totalMemSize % pageSize != 0
-                || ((pageSize == 0) && (pageSize & (pageSize - 1))) )
+                || (pageSize == 0) || (pageSize & (pageSize - 1)) )
     {
         cout << "Invalid Input!" << endl;
-        cout << "Total Memory Size must be evenly divisible by Page Size." << endl;
+        cout << "Page Size must be a power of 2 and divide Memory evenly" << endl << endl;
         cout << "What is the Page Size: ";
         cin.clear();
         cin.ignore(100,'\n');
@@ -336,8 +349,10 @@ int main(int argc, const char * argv[]) {
     
     int totalFrames = totalMemSize / pageSize;
     
+    activeRecord.first = false;
+    
     for (int i = 0; i< totalFrames; i++) {
-        frameList.push_back(active);
+        frameList.push_back(activeRecord);
     }
     
     
@@ -387,7 +402,7 @@ int main(int argc, const char * argv[]) {
                         cout << endl;
                         PCB newProcess(systemPID);
                         newProcess.setProcessSize(processSize);
-                        if ((usedMem + processSize) < totalMemSize) {
+                        if ((usedMem + processSize) <= totalMemSize) {
                             readyQueue.push_back(newProcess);
                             cout << "Process added to ready queue" << endl << endl;
                             if (processSize % pageSize == 0) {
@@ -418,8 +433,9 @@ int main(int argc, const char * argv[]) {
                             int j = 0;
                             while (j < framesNeeded) {
                                 
-                                if (frameList[i] == false) {
-                                    frameList[i] = true;
+                                if (frameList[i].first == false) {
+                                    frameList[i].first = true;
+                                    frameList[i].second = readyQueue.back().getPID();
                                     readyQueue.back().updateFrames(i);
                                     j++;
                                 }
@@ -447,13 +463,13 @@ int main(int argc, const char * argv[]) {
                     
                     do{
                         cout << "Please choose the snapshot you'd like:" << endl;
-                        cout << "'r', 'p', 'd', or 'c' : ";
+                        cout << "'r', 'p', 'd', 'c', or 'm' : ";
                         
                         cin >> userInput;
                         
                         cout << endl;
                     }
-                    while (userInput != "r" && userInput != "p" && userInput != "d" && userInput != "c");
+                    while (userInput != "r" && userInput != "p" && userInput != "d" && userInput != "c" && userInput != "m");
                     
                     //READY QUEUE PRINT*****************************************
                     if (userInput == "r") {
@@ -483,7 +499,51 @@ int main(int argc, const char * argv[]) {
                         cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
                         cout  << endl;
+                        cout << "PIDs in Job Pool: ";
+                        
+                        if (!jobPool.empty()) {
+                            for (int i = 0 ; i < jobPool.size(); i++) {
+                                
+                                cout << jobPool[i].getPID() << " ";
+                                
+                            }
+                        }
+                        else{
+                            cout << "Empty";
+                        }
+                        
+                        cout << endl << endl;
                     }
+                    //MEMORY PRINT*****************************************
+                    else if (userInput == "m") {
+                        cout << endl << "MEMORY INFORMATION" << endl << endl;
+                        cout << "-------------------" << endl;
+                        cout << left << "| " <<  setw(6) << "Frame "
+                        << left << "| " <<  setw(6) << "Process |" << endl;
+                        cout << "-------------------" << endl;
+                        
+                        for (int i = 0 ; i < frameList.size(); i++) {
+                            if (frameList[i].first == true) {
+                                
+                                cout << left << "| " <<  setw(6) << i
+                                << left << "| " <<  setw(7) << frameList[i].second << " |" << endl;
+                                
+                                //cout << "Frame | " << i << " Process |" << frameList[i].second << " |" << endl;
+                            }
+                            
+                        }
+                        cout << "-------------------" << endl << endl;
+                        
+                        cout << "Free Frames: ";
+                        for (int i = 0 ; i < frameList.size(); i++) {
+                            if (frameList[i].first == false) {
+                                cout << i << " ";
+                            }
+                        }
+                        cout << endl << endl;
+                        
+                    }
+
                     
                     //PRINTER QUEUE PRINT*****************************************
                     else if (userInput == "p") {
@@ -572,7 +632,7 @@ int main(int argc, const char * argv[]) {
                         vector<int> frames = readyQueue.front().getFrames();
                         
                         for (int i = 0 ; i < frames.size() ; i++) {
-                            frameList[frames[i]] = false;
+                            frameList[frames[i]].first = false;
                         }
                         
                         readyQueue.pop_front();
@@ -586,11 +646,35 @@ int main(int argc, const char * argv[]) {
                             while (jobPool.back().getProcessSize() > freeMem && i < jobPool.size()) {
                                 jobPool.push_front(jobPool.back());
                                 jobPool.pop_back();
+                                i++;
+                                
                             }
                             if (jobPool.back().getProcessSize() < freeMem) {
                                 readyQueue.push_back(jobPool.back());
                                 jobPool.pop_back();
                                 cout << "Process " << readyQueue.back().getPID() << " added to Ready Queue" << endl;
+                                int framesNeeded;
+                                
+                                if (processSize % pageSize == 0) {
+                                    framesNeeded = processSize/pageSize;
+                                }
+                                else{
+                                    framesNeeded = (processSize/pageSize) + 1;
+                                }
+                                
+                                int i = 0;
+                                int j = 0;
+                                while (j < framesNeeded) {
+                                    
+                                    if (frameList[i].first == false) {
+                                        frameList[i].first = true;
+                                        frameList[i].second = readyQueue.back().getPID();
+                                        readyQueue.back().updateFrames(i);
+                                        j++;
+                                    }
+                                    i++;
+                                }
+
                                 if (readyQueue.back().getProcessSize() % pageSize == 0) {
                                     usedMem = usedMem + readyQueue.back().getProcessSize();
                                     freeMem = totalMemSize - usedMem;
@@ -613,7 +697,7 @@ int main(int argc, const char * argv[]) {
                         
                     }
                 }
-
+                //MOVETOBACKOFQUEUE******************************
                 else if(userInput == "T"){
                     if (readyQueue.empty()) {
                         cout << "The Ready Queue is empty" << endl << endl;
@@ -635,6 +719,193 @@ int main(int argc, const char * argv[]) {
                 
                 
                 
+
+                //KILL PROCESS ANYWHERE*****************************************
+                else if(userInput[0] == 'K'){
+                    userInput.erase(0,1);
+                    if (checkValidNum(userInput, systemPID - 1) || stoi(userInput) == 0) {
+                        PCB temp(-1);
+                        int i = 0;
+                        bool found = false;
+                        int searchPID = stoi(userInput);
+                        //READY QUEUE KILL***************************************
+                        while (i < readyQueue.size() && found == false) {
+                            cout << "Searching Ready Queue" << endl;
+                            
+                            
+                            if (searchPID == readyQueue[i].getPID()) {
+                                temp = readyQueue[i];
+                                readyQueue.erase(readyQueue.begin()+i);
+                                
+                                found = true;
+                                cout << "Found the Process in the Ready Queue" << endl << endl;
+                                if (i == 0) {
+                                    readTimeSlice(temp, timeSlice);
+                                }
+                                
+                            }
+                            i++;
+                        }
+                        //PRINT KILL*********************************************
+                        if (found == false) {
+                            for (int i = 1; i < printers.size(); i++) {
+                                for (int j = 0; j < printers[i].size(); j++) {
+                                    cout << "Searching Print Queues" << endl;
+                                    if (searchPID == printers[i][j].getPID()) {
+                                        temp = printers[i][j];
+                                        printers[i].erase(printers[i].begin() + j);
+                                        found = true;
+                                        cout << "Found the Process in the Print Queue" << endl << endl;
+                                        
+                                    }
+                                    
+                                }
+                            }
+                        }
+                        
+                        
+                        //DISK KILL*********************************************
+                        
+                        if (found == false) {
+                            for (int i = 1; i < disks.size(); i++) {
+                                
+                                if (disks[i].findProcess(searchPID)) {
+                                    temp = disks[i].killProcess(searchPID);
+                                }
+                                
+                            }
+                        }
+                        
+                        //CDRW KILL*********************************************
+                        if (found == false) {
+                            for (int i = 1; i < cdrws.size(); i++) {
+                                for (int j = 0; j < cdrws[i].size(); j++) {
+                                    cout << "Searching CDRW Queue" << endl;
+                                    if (searchPID == cdrws[i][j].getPID()) {
+                                        temp = cdrws[i][j];
+                                        cdrws[i].erase(cdrws[i].begin() + j);
+                                        found = true;
+                                        cout << "Found the Process in the CDRW Queue" << endl << endl;
+                                    }
+                                    
+                                }
+                            }
+                        }
+                        //CLEAN UP FOR NON JOB POOL
+                        if (found == true) {
+                            //readTimeSlice(temp, timeSlice);
+                            cout << "Killing Process " << temp.getPID() << endl;
+                            cout << "Total CPU time was " << temp.getTotalProcessTime() << endl;
+                            
+                            terminatedProcessCount++;
+                            terminatedProcessTotalTime += temp.getTotalProcessTime();
+                            
+                            if (temp.getProcessSize() % pageSize == 0) {
+                                usedMem = usedMem - temp.getProcessSize();
+                                freeMem = totalMemSize - usedMem;
+                            }
+                            else{
+                                roundedProcessSize = ((temp.getProcessSize() / pageSize) + 1) * pageSize;
+                                usedMem = usedMem - roundedProcessSize;
+                                freeMem = totalMemSize - usedMem;
+                            }
+                            
+                            cout << "Free Memory: " << freeMem << endl;
+                            cout << "Used Memory: " << usedMem << endl;
+                            
+                            vector<int> frames = temp.getFrames();
+                            
+                            for (int i = 0 ; i < frames.size() ; i++) {
+                                frameList[frames[i]].first = false;
+                            }
+                            
+                            
+                            cout  << endl;
+                            totalAveTerminatedCpuTime = (float)terminatedProcessTotalTime/terminatedProcessCount;
+                            
+                            
+                            
+                            i = 0;
+                            while (!jobPool.empty() && jobPool.front().getProcessSize() <= freeMem ) {
+                                while (jobPool.back().getProcessSize() > freeMem && i < jobPool.size()) {
+                                    jobPool.push_front(jobPool.back());
+                                    jobPool.pop_back();
+                                    i++;
+                                    
+                                }
+                                if (jobPool.back().getProcessSize() <= freeMem) {
+                                    readyQueue.push_back(jobPool.back());
+                                    jobPool.pop_back();
+                                    cout << "Process " << readyQueue.back().getPID() << " added to Ready Queue" << endl;
+                                    int framesNeeded;
+                                    
+                                    if (processSize % pageSize == 0) {
+                                        framesNeeded = processSize/pageSize;
+                                    }
+                                    else{
+                                        framesNeeded = (processSize/pageSize) + 1;
+                                    }
+                                    
+                                    int i = 0;
+                                    int j = 0;
+                                    while (j < framesNeeded) {
+                                        
+                                        if (frameList[i].first == false) {
+                                            frameList[i].first = true;
+                                            frameList[i].second = readyQueue.back().getPID();
+                                            readyQueue.back().updateFrames(i);
+                                            j++;
+                                        }
+                                        i++;
+                                    }
+                                    
+                                    if (readyQueue.back().getProcessSize() % pageSize == 0) {
+                                        usedMem = usedMem + readyQueue.back().getProcessSize();
+                                        freeMem = totalMemSize - usedMem;
+                                    }
+                                    else{
+                                        roundedProcessSize = ((readyQueue.back().getProcessSize() / pageSize) + 1) * pageSize;
+                                        usedMem += roundedProcessSize;
+                                        freeMem = totalMemSize - usedMem;
+                                    }
+                                    
+                                    cout << "Free Memory: " << freeMem << endl;
+                                    cout << "Used Memory: " << usedMem << endl;
+                                    i = 0;
+                                }
+                                sort(jobPool.begin(), jobPool.end(), sortHelp);
+                            }
+                        }
+
+                        
+                        
+                        //JOB POOL KILL*********************************************
+                        if (found == false) {
+                            for (int i = 0; i < jobPool.size(); i++) {
+                                if (searchPID == jobPool[i].getPID()) {
+                                    cout << "Searching Job Pool" << endl;
+                                    PCB temp = jobPool[i];
+                                    jobPool.erase(jobPool.begin() + i);
+                                    found = true;
+                                    cout << "Found the Process in the Job Pool" << endl << endl;
+                                    cout << "Killing Process " << temp.getPID() << endl << endl;
+                                    terminatedProcessCount++;
+                                }
+                            }
+                        }
+
+                        if (found == false) {
+                            cout << "PID not found" << endl << endl;
+                        }
+                        
+                    }
+                    else{
+                        cout << "PID does not exist" << endl << endl;
+                    }
+                    
+                    
+                    
+                }
                 
                 //ADD TO PRINTER QUEUE*****************************************
                 else if(userInput[0] == 'p'){

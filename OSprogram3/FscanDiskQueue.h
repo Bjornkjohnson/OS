@@ -28,6 +28,8 @@ public:
     void push_back(PCB &);
     PCB front();
     void pop_front();
+    bool findProcess(int);
+    PCB killProcess(int);
 
 
 };

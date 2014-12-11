@@ -58,3 +58,32 @@ void FscanDiskQueue::pop_front(){
     }
     fscanQueues[0].pop_front();
 }
+
+bool FscanDiskQueue::findProcess(int PID){
+    for (int i = 0; i < fscanQueues.size(); i++) {
+        for (int j = 0; j < fscanQueues[i].size(); j++) {
+            cout << "Searching Disk Queues" << endl;
+            if (fscanQueues[i][j].getPID() == PID) {
+                return true;
+            }
+            
+        }
+    }
+    return false;
+
+}
+
+PCB FscanDiskQueue::killProcess(int PID){
+    for (int i = 0; i < fscanQueues.size(); i++) {
+        for (int j = 0; j < fscanQueues[i].size(); j++) {
+            if (fscanQueues[i][j].getPID() == PID) {
+                PCB temp = fscanQueues[i][j];
+                fscanQueues[i].erase(fscanQueues[i].begin() + j);
+                return temp;
+            }
+            
+        }
+    }
+    PCB error(-1);
+    return error;
+}
