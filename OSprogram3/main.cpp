@@ -481,7 +481,7 @@ int main(int argc, const char * argv[]) {
                                 aveBurst = ((float)readyQueue[i].getTotalProcessTime())/readyQueue[i].getCpuCount();
                             }
                             
-                            cout << left << "| " <<  setw(5) << readyQueue[i].getPID()
+                            cout << left << "  " <<  setw(5) << readyQueue[i].getPID()
                             << left << "| " <<  setw(9) << "N/A"
                             << left << "| " <<  setw(8) << "N/A"
                             << left << "| " <<  setw(9) << "N/A"
@@ -499,12 +499,12 @@ int main(int argc, const char * argv[]) {
                         cout <<" ---------------------------------------------------------------------------------------------"<<endl;
 
                         cout  << endl;
-                        cout << "PIDs in Job Pool: ";
+                        cout << "Job Pool PID numbers: ";
                         
                         if (!jobPool.empty()) {
                             for (int i = 0 ; i < jobPool.size(); i++) {
                                 
-                                cout << jobPool[i].getPID() << " ";
+                                cout << "PID " << jobPool[i].getPID() << " ";
                                 
                             }
                         }

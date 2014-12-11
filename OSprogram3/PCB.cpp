@@ -67,14 +67,13 @@ void PCB::printFrames() const{
     for (int i = 0; i < frames.size() - 1; i++) {
         cout << frames[i] << ",";
     }
-    cout << setw(8) << frames[frames.size() - 1]  << left << "| "
-    << endl;;
+    cout << setw(8) << frames[frames.size() - 1]  << left << endl;;
 }
 
 ostream& operator<<(ostream& out, const PCB& dt){
     
     if (dt.readWrite == "r" && dt.cylinderNum == 0) {
-        out << left << "| " <<  setw(5) << dt.PID
+        out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
         << left << "| " <<  setw(8) <<dt.memStart
         << left << "| " <<  setw(9) <<dt.physicalAddress
@@ -88,7 +87,7 @@ ostream& operator<<(ostream& out, const PCB& dt){
         
     }
     else if(dt.readWrite == "w" && dt.cylinderNum == 0){
-        out << left << "| " <<  setw(5) << dt.PID
+        out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
         << left << "| " <<  setw(8) << dt.memStart
         << left << "| " <<  setw(9) <<dt.physicalAddress
@@ -101,7 +100,7 @@ ostream& operator<<(ostream& out, const PCB& dt){
         dt.printFrames();
     }
     else if (dt.readWrite == "w" && dt.cylinderNum != 0){
-        out << left << "| " <<  setw(5) << dt.PID
+        out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) <<  dt.fileName        //file
         << left << "| " <<  setw(8) << dt.memStart        //mem
         << left << "| " <<  setw(9) <<dt.physicalAddress
@@ -115,7 +114,7 @@ ostream& operator<<(ostream& out, const PCB& dt){
 
     }
     else {
-        out << left << "| " <<  setw(5) << dt.PID
+        out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
         << left << "| " <<  setw(8) << dt.memStart
         << left << "| " <<  setw(9) <<dt.physicalAddress
@@ -141,9 +140,9 @@ void PCB::fillPCB(char procType, bool isDisk, int cylinderMax, int pageSize){
     //**********************************
     cout << "Please enter mem start in hex: ";
     cin >> hex >> this->memStart  >> dec;
-    while(!cin)
+    while(!cin || memStart > processSize)
     {
-        cout << "That was not a number!" << endl;
+        cout << "Mem Start must be smaller than Process Size" << endl;
         cout << "Please enter mem start: ";
         cin.clear();
         cin.ignore(100,'\n');
@@ -182,9 +181,10 @@ void PCB::fillPCB(char procType, bool isDisk, int cylinderMax, int pageSize){
         cout << "Please enter file length: ";
         cin >> this->fileLength;
         cout << endl;
-        while(!cin)
+        while(!cin || (memStart + fileLength) > processSize)
         {
-            cout << "That was not a number!" << endl;
+            cout << "That will write outside of your memory" << endl;
+            cout << "Please shorten file length" << endl;
             cout << "Please enter file length: ";
             cin.clear();
             cin.ignore(100,'\n');
