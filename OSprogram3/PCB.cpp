@@ -75,8 +75,8 @@ ostream& operator<<(ostream& out, const PCB& dt){
     if (dt.readWrite == "r" && dt.cylinderNum == 0) {
         out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
-        << left << "| " <<  setw(8) <<dt.memStart
-        << left << "| " <<  setw(9) <<dt.physicalAddress
+        << left << "| " <<  setw(8) << hex <<dt.memStart << dec
+        << left << "| " <<  setw(9) << hex << dt.physicalAddress << dec
         << left << "| " <<  setw(5)  <<dt.readWrite
         << left << "| " <<  setw(8) << "N/A"
         << left << "| " <<  setw(6)  << "N/A"
@@ -89,8 +89,8 @@ ostream& operator<<(ostream& out, const PCB& dt){
     else if(dt.readWrite == "w" && dt.cylinderNum == 0){
         out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
-        << left << "| " <<  setw(8) << dt.memStart
-        << left << "| " <<  setw(9) <<dt.physicalAddress
+        << left << "| " <<  setw(8) << hex <<dt.memStart << dec
+        << left << "| " <<  setw(9) << hex << dt.physicalAddress << dec
         << left << "| " <<  setw(5)  << dt.readWrite
         << left << "| " <<  setw(8) << dt.fileLength
         << left << "| " <<  setw(6)  << "N/A"
@@ -102,8 +102,8 @@ ostream& operator<<(ostream& out, const PCB& dt){
     else if (dt.readWrite == "w" && dt.cylinderNum != 0){
         out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) <<  dt.fileName        //file
-        << left << "| " <<  setw(8) << dt.memStart        //mem
-        << left << "| " <<  setw(9) <<dt.physicalAddress
+        << left << "| " <<  setw(8) << hex <<dt.memStart << dec        //mem
+        << left << "| " <<  setw(9) << hex << dt.physicalAddress << dec
         << left << "| " <<  setw(5)  <<  dt.readWrite       //read
         << left << "| " <<  setw(8) <<  dt.fileLength      //length
         << left << "| " <<  setw(6)  <<  dt.cylinderNum      //cyl#
@@ -116,8 +116,8 @@ ostream& operator<<(ostream& out, const PCB& dt){
     else {
         out << left << "  " <<  setw(5) << dt.PID
         << left << "| " <<  setw(9) << dt.fileName
-        << left << "| " <<  setw(8) << dt.memStart
-        << left << "| " <<  setw(9) <<dt.physicalAddress
+        << left << "| " <<  setw(8) << hex <<dt.memStart << dec
+        << left << "| " <<  setw(9) << hex << dt.physicalAddress << dec
         << left << "| " <<  setw(5)  << dt.readWrite
         << left << "| " <<  setw(8) << "N/A"
         << left << "| " <<  setw(6)  << dt.cylinderNum

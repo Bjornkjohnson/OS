@@ -208,7 +208,7 @@ int main(int argc, const char * argv[]) {
         cin >> totalMemSize;
         cout << endl;
     }
-    cout << " The Total Memory Size is " << totalMemSize << endl;
+    cout << " The Total Memory Size is " << totalMemSize << " Words" << endl;
     cout << endl;
 
     //************MaxProcessSize****************
@@ -225,7 +225,7 @@ int main(int argc, const char * argv[]) {
         cin >> maxProcessSize;
         cout << endl;
     }
-    cout << " The Max Process Size is " << maxProcessSize << endl;
+    cout << " The Max Process Size is " << maxProcessSize << " Words" << endl;
     cout << endl;
 
     //************PageSize****************
@@ -243,7 +243,7 @@ int main(int argc, const char * argv[]) {
         cin >> pageSize;
         cout << endl;
     }
-    cout << " The Page Size is " << pageSize << endl;
+    cout << " The Page Size is " << pageSize << " Words" << endl;
     cout << endl;
     //cout << "Total Memory size must be deivisible by" << endl;
     //************Timeslice****************
